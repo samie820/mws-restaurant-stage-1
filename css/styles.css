@@ -328,6 +328,7 @@ nav h1 a {
   }
   .inside #footer {
     width: 100%;
+    position: absolute;
   }
   #breadcrumb {
     width: 100%;
@@ -335,6 +336,20 @@ nav h1 a {
 
 }
 
+/************************SKIP-LINK ****************************************/
+.skip-link {
+  position: absolute;
+  top: -40px;
+  left: 0;
+  background: #032d52;
+  color: #eee;
+  padding: 8px;
+  z-index: 10000;
+}
+
+.skip-link:focus {
+  top: 0;
+}
 /*************************Flexbox grid ***********************************/
 .flex-grid {
   display: flex;

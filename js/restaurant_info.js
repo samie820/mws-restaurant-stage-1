@@ -15,7 +15,7 @@ initMap = () => {
   fetchRestaurantFromURL((error, restaurant) => {
     if (error) { // Got an error!
       console.error(error);
-    } else {      
+    } else {
       self.newMap = L.map('map', {
         center: [restaurant.latlng.lat, restaurant.latlng.lng],
         zoom: 16,
@@ -149,20 +149,25 @@ fillReviewsHTML = (reviews = self.restaurant.reviews) => {
  */
 createReviewHTML = (review) => {
   const li = document.createElement('li');
+  li.setAttribute("tabindex","0");
   const name = document.createElement('p');
+  name.setAttribute("tabindex","0");
   name.innerHTML = review.name;
   li.appendChild(name);
 
   const date = document.createElement('p');
   date.innerHTML = review.date;
+  date.setAttribute("tabindex","0");
   li.appendChild(date);
 
   const rating = document.createElement('p');
-  rating.innerHTML = `<span class="rating">Rating: ${review.rating}</span>`;
+  rating.innerHTML = `<span tabindex="0" class="rating">Rating: ${review.rating}</span>`;
+  rating.setAttribute("tabindex","0");
   li.appendChild(rating);
 
   const comments = document.createElement('p');
   comments.innerHTML = review.comments;
+  comments.setAttribute("tabindex","0");
   li.appendChild(comments);
 
   return li;
