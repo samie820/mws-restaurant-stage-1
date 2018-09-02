@@ -8,27 +8,76 @@ class DBHelper {
    * Change this to restaurants.json file location on your server.
    */
   static get DATABASE_URL() {
-    const port = 8000 // Change this to your server port
-    return `http://localhost:${port}/data/restaurants.json`;
+    const port = 1337 // Change this to your server port
+    return `http://localhost:${port}/restaurants`;
   }
 
   /**
    * Fetch all restaurants.
    */
   static fetchRestaurants(callback) {
-    let xhr = new XMLHttpRequest();
-    xhr.open('GET', DBHelper.DATABASE_URL);
-    xhr.onload = () => {
-      if (xhr.status === 200) { // Got a success response from server!
-        const json = JSON.parse(xhr.responseText);
-        const restaurants = json.restaurants;
-        callback(null, restaurants);
-      } else { // Oops!. Got an error from server.
-        const error = (`Request failed. Returned status of ${xhr.status}`);
-        callback(error, null);
-      }
-    };
-    xhr.send();
+    const appOnline = window.navigator.onLine;
+    if(appOnline) {
+      DBHelper.fetchRestaurantsFromServer(callback);
+    } else {
+      DBHelper.getRestaurantsFromDB(callback);
+    }
+  }
+
+    /**
+   * Fetch all restaurants from the server.
+   */
+  static fetchRestaurantsFromServer(callback) {
+    fetch(DBHelper.DATABASE_URL)
+    .then(res => res.json())
+    .then((response) => {
+      callback(null, response);
+      DBHelper.saveRestaurantsToDB(response); // save to IndexedDB
+    }) // Got a successfully response from the server
+    .catch((errorMessage) => {
+      const error = (`Request failed. Returned status of ${errorMessage}`);
+      callback(error, null)
+    });
+  }
+
+  /**
+   * Save response from the server to the database
+   * @param {Object} restaurants
+   */
+  static saveRestaurantsToDB(restaurants) {
+    const dbPromise = idb.open('restaurantDatabase', 1, function(upgradeDB){
+      upgradeDB.createObjectStore('restaurants', {keyPath: 'id'});
+    })
+    dbPromise.then(function(db){
+      const tx = db.transaction('restaurants', 'readwrite');
+      const restaurantStore = tx.objectStore('restaurants');
+      // save the recieved restaurants to the DB
+      restaurants.forEach(function(restaurant){
+        restaurantStore.put(restaurant);
+        return tx.complete;
+      })
+      return restaurantStore.getAll();
+    })
+  }
+
+    /**
+   * Retrieve response from the database
+   *
+   */
+  static getRestaurantsFromDB(callback){
+    const dbPromise = idb.open('restaurantDatabase');
+    dbPromise.then(function(db){
+      const tx = db.transaction('restaurants');
+      const restaurantStore = tx.objectStore('restaurants');
+      return restaurantStore.getAll();
+    })
+    .then(function(restaurants){
+      callback(null, restaurants);
+    })
+    .catch(function(error) {
+      const error = (`Request failed. Returned status of ${error}`);
+      callback(error, null)
+    })
   }
 
   /**
@@ -150,7 +199,10 @@ class DBHelper {
    * Restaurant image URL.
    */
   static imageUrlForRestaurant(restaurant) {
-    return (`/img/${restaurant.photograph}`);
+    if(restaurant.photograph){
+      return (`/img/${restaurant.photograph}.jpg`);
+    }
+    return '/img/10.jpg';
   }
 
   /**

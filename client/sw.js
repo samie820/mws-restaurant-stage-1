@@ -7,13 +7,13 @@ self.addEventListener("install", e => {
         "https://unpkg.com/leaflet@1.3.1/dist/leaflet.js",
         "https://unpkg.com/leaflet@1.3.1/dist/leaflet.css",
         "/index.html",
+        "/manifest.json",
         "/restaurant.html",
         "/js/restaurant_info.js",
         "/js/dbhelper.js",
         "/js/main.js",
         "/sw.js",
         "/css/styles.css",
-        "/data/restaurants.json",
         "/img/1.jpg",
         "/img/2.jpg",
         "/img/3.jpg",
@@ -24,6 +24,8 @@ self.addEventListener("install", e => {
         "/img/8.jpg",
         "/img/9.jpg",
         "/img/10.jpg",
+        "/icons/food_256.png",
+        "/icons/food_512.png",
       ]);
     })
   );
